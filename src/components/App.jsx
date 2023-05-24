@@ -16,7 +16,7 @@ class App extends Component {
     selectedImage: null,
     isLoading: false,
     page: 1,
-    hasMoreImages: true,
+    totalPage: 1,
   };
 
   componentDidMount() {
@@ -24,7 +24,10 @@ class App extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.searchQuery !== this.state.searchQuery) {
+    if (
+      prevState.searchQuery !== this.state.searchQuery ||
+      prevState.page !== this.state.page
+    ) {
       this.fetchImages();
     }
   }
@@ -42,7 +45,7 @@ class App extends Component {
       this.setState(prevState => ({
         images: page === 1 ? images : [...prevState.images, ...images],
         isLoading: false,
-        hasMoreImages: images.length > 0,
+        totalPage: Math.ceil(images.total / 12),
       }));
 
       if (images.length === 0) {
@@ -65,19 +68,13 @@ class App extends Component {
       searchQuery: query,
       images: [],
       page: 1,
-      hasMoreImages: true,
     });
   };
 
   handleLoadMore = () => {
-    this.setState(
-      prevState => ({
-        page: prevState.page + 1,
-      }),
-      () => {
-        this.fetchImages();
-      }
-    );
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
   };
 
   handleImageClick = image => {
@@ -93,16 +90,17 @@ class App extends Component {
   };
 
   render() {
-    const { images, selectedImage, isLoading, hasMoreImages } = this.state;
+    const { images, selectedImage, isLoading } = this.state;
+    const { page, totalPage } = this.state;
+    const hasMoreImages = page < totalPage;
 
     return (
       <AppStyle.Appform>
         <Searchbar onSubmit={this.handleSearchSubmit} />
         <ImageGallery images={images} onImageClick={this.handleImageClick} />
         {isLoading && <Loader />}
-        {images.length > 0 && !isLoading && hasMoreImages && (
-          <Button onClick={this.handleLoadMore} />
-        )}
+        {hasMoreImages && <Button onClick={this.handleLoadMore} />}
+
         {selectedImage && (
           <Modal
             imageUrl={selectedImage.largeImageURL}
