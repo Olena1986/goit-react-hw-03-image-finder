@@ -1,10 +1,16 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 import { ImgGalleryStyle } from './ImageGallery.styled';
+
 const ImageGallery = ({ images, onImageClick }) => {
+  const uniqueImages = images.filter(
+    (image, index, self) => self.findIndex(img => img.id === image.id) === index
+  );
+
   return (
     <ImgGalleryStyle.GalleryStyle>
-      {images.map(image => (
+      {uniqueImages.map(image => (
         <ImageGalleryItem
           key={image.id}
           image={image}
@@ -13,6 +19,15 @@ const ImageGallery = ({ images, onImageClick }) => {
       ))}
     </ImgGalleryStyle.GalleryStyle>
   );
+};
+
+ImageGallery.propTypes = {
+  images: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+    })
+  ).isRequired,
+  onImageClick: PropTypes.func.isRequired,
 };
 
 export default ImageGallery;

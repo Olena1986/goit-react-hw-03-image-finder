@@ -1,4 +1,5 @@
 import axios from 'axios';
+import PropTypes from 'prop-types';
 
 axios.defaults.baseURL = 'https://pixabay.com/api/';
 
@@ -28,4 +29,10 @@ export const fetchImages = async (query, page = 1, perPage = 12) => {
     console.error('Error fetching images:', error);
     throw error;
   }
+};
+
+fetchImages.propTypes = {
+  query: PropTypes.string.isRequired,
+  page: PropTypes.number,
+  perPage: PropTypes.number,
 };

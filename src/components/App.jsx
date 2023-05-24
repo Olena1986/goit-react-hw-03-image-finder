@@ -4,7 +4,7 @@ import ImageGallery from './imageGallery/ImageGallery';
 import Button from './Button/Button';
 import Loader from './Loader/Loader';
 import Modal from './Modal/Modal';
-import { fetchImages } from './servises/api.js';
+import { fetchImages } from '../servises/api.js';
 import { AppStyle } from './App.styled';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -16,6 +16,7 @@ class App extends Component {
     selectedImage: null,
     isLoading: false,
     page: 1,
+    hasMoreImages: true,
   };
 
   componentDidMount() {
@@ -41,6 +42,7 @@ class App extends Component {
       this.setState(prevState => ({
         images: page === 1 ? images : [...prevState.images, ...images],
         isLoading: false,
+        hasMoreImages: images.length > 0,
       }));
 
       if (images.length === 0) {
@@ -63,30 +65,19 @@ class App extends Component {
       searchQuery: query,
       images: [],
       page: 1,
+      hasMoreImages: true,
     });
   };
 
-  handleLoadMore = async () => {
-    try {
-      this.setState({ isLoading: true });
-
-      const { searchQuery, page, images } = this.state;
-      const nextPage = page + 1;
-      const newImages = await fetchImages(searchQuery, nextPage);
-
-      const uniqueNewImages = newImages.filter(
-        newImage => !images.some(image => image.id === newImage.id)
-      );
-
-      this.setState(prevState => ({
-        images: [...prevState.images, ...uniqueNewImages],
-        page: nextPage,
-        isLoading: false,
-      }));
-    } catch (error) {
-      console.error('Error fetching images:', error);
-      this.setState({ isLoading: false });
-    }
+  handleLoadMore = () => {
+    this.setState(
+      prevState => ({
+        page: prevState.page + 1,
+      }),
+      () => {
+        this.fetchImages();
+      }
+    );
   };
 
   handleImageClick = image => {
@@ -102,14 +93,14 @@ class App extends Component {
   };
 
   render() {
-    const { images, selectedImage, isLoading } = this.state;
+    const { images, selectedImage, isLoading, hasMoreImages } = this.state;
 
     return (
       <AppStyle.Appform>
         <Searchbar onSubmit={this.handleSearchSubmit} />
         <ImageGallery images={images} onImageClick={this.handleImageClick} />
         {isLoading && <Loader />}
-        {images.length > 0 && !isLoading && (
+        {images.length > 0 && !isLoading && hasMoreImages && (
           <Button onClick={this.handleLoadMore} />
         )}
         {selectedImage && (
@@ -118,7 +109,7 @@ class App extends Component {
             onClose={this.handleCloseModal}
           />
         )}
-        <ToastContainer />
+        <ToastContainer autoClose={1000} />
       </AppStyle.Appform>
     );
   }

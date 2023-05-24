@@ -1,36 +1,50 @@
-import React, { useState } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { SearchStyle } from './SerachBar.styled';
+import { BiSearchAlt } from 'react-icons/bi';
 
-const Searchbar = ({ onSubmit }) => {
-  const [query, setQuery] = useState('');
+class Searchbar extends Component {
+  state = {
+    query: '',
+  };
 
-  const handleSubmit = e => {
+  handleSubmit = e => {
     e.preventDefault();
-    onSubmit(query);
-    setQuery('');
+    const { query } = this.state;
+    this.props.onSubmit(query);
+    this.setState({ query: '' });
   };
 
-  const handleChange = e => {
-    setQuery(e.target.value);
+  handleChange = e => {
+    this.setState({ query: e.target.value });
   };
 
-  return (
-    <SearchStyle.SearchBar>
-      <SearchStyle.SearchForm onSubmit={handleSubmit}>
-        <SearchStyle.SearchButton type="submit">
-          <SearchStyle.SearchLabel>Search</SearchStyle.SearchLabel>
-        </SearchStyle.SearchButton>
-        <SearchStyle.SearchInput
-          type="text"
-          autoComplete="off"
-          autoFocus
-          placeholder="Search images and photos"
-          value={query}
-          onChange={handleChange}
-        />
-      </SearchStyle.SearchForm>
-    </SearchStyle.SearchBar>
-  );
+  render() {
+    const { query } = this.state;
+
+    return (
+      <SearchStyle.SearchBar>
+        <SearchStyle.SearchForm onSubmit={this.handleSubmit}>
+          <SearchStyle.SearchButton type="submit">
+            <BiSearchAlt />
+            <SearchStyle.SearchLabel>Search</SearchStyle.SearchLabel>
+          </SearchStyle.SearchButton>
+          <SearchStyle.SearchInput
+            type="text"
+            autoComplete="off"
+            autoFocus
+            placeholder="Search images and photos"
+            value={query}
+            onChange={this.handleChange}
+          />
+        </SearchStyle.SearchForm>
+      </SearchStyle.SearchBar>
+    );
+  }
+}
+
+Searchbar.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
 };
 
 export default Searchbar;
