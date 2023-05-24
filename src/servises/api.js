@@ -18,12 +18,12 @@ export const fetchImages = async (query, page = 1, perPage = 12) => {
       },
     });
 
-    const images = response.data.hits.map(image => ({
+    const imgData = response.data.hits.map(image => ({
       id: image.id,
       webformatURL: image.webformatURL,
       largeImageURL: image.largeImageURL,
     }));
-
+    const images = { imgData, total: response.data.total };
     return images;
   } catch (error) {
     console.error('Error fetching images:', error);

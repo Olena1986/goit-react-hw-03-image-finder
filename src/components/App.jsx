@@ -43,7 +43,10 @@ class App extends Component {
       const images = await fetchImages(searchQuery, page);
 
       this.setState(prevState => ({
-        images: page === 1 ? images : [...prevState.images, ...images],
+        images:
+          page === 1
+            ? images.imgData
+            : [...prevState.images, ...images.imgData],
         isLoading: false,
         totalPage: Math.ceil(images.total / 12),
       }));
